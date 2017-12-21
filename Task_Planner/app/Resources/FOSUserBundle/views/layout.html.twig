@@ -1,0 +1,20 @@
+{% extends('base.html.twig') %}
+{% block script %}<script src="{{ asset('js/pofile.js') }}"></script>{% endblock %}
+{% block content %}
+    {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <div id="wrapper" class="toggled">
+                <div id="sidebar-wrapper">
+                    {% include "AppBundle:Planner:nav_content.html.twig" %}
+                </div>
+                <div id="page-content-wrapper">
+                    {% block fos_profile_content %}
+                    {% endblock fos_profile_content %}
+                </div>
+            </div>
+        {% else %}
+            <div id="content">
+                {% block fos_user_content %}
+                {% endblock fos_user_content %}
+            </div>
+        {% endif %}
+{% endblock %}
