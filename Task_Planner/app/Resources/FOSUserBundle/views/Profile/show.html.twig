@@ -1,4 +1,9 @@
 {% extends "@FOSUser/layout.html.twig" %}
+{% block navbar %}
+    <li class="nav-item">
+        <a href="{{ path('fos_user_profile_edit') }}" class="nav-link">Edit</a>
+    </li>
+{% endblock navbar %}
 {% block fos_profile_content %}
     {% include "@FOSUser/Profile/show_content.html.twig" %}
 {% endblock fos_profile_content %}

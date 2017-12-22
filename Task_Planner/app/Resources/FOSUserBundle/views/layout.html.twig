@@ -6,9 +6,16 @@
                 <div id="sidebar-wrapper">
                     {% include "AppBundle:Planner:nav_content.html.twig" %}
                 </div>
-                <div id="page-content-wrapper">
-                    {% block fos_profile_content %}
-                    {% endblock fos_profile_content %}
+                <div id="page-content-wrapper" style="padding: 0px">
+                    <div class="navbar navbar-expand-sm navbar-dark bg-dark small" style="border-left: 1px solid #999999; padding: 3px;">
+                        <ul class="navbar-nav mr-auto">
+                            {% block navbar %}{% endblock navbar %}
+                        </ul>
+                    </div>
+                    <div class="body" style="padding: 10px;">
+                        {% block fos_profile_content %}
+                        {% endblock fos_profile_content %}
+                    </div>
                 </div>
             </div>
         {% else %}
