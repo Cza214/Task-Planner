@@ -1,0 +1,14 @@
+{% extends('AppBundle:Task:task.html.twig') %}
+{% block body %}
+    <ul class="list-group">
+        <li class="list-group-item active">
+            2017 Tasks
+            <span class="float-right"><a href="" class="btn btn-outline-warning btn-sm">{{ current|date("d-m-Y") }}</a></span>
+        </li>
+        {% for i in 0..11 %}
+            <a href="/{{ i }}" class="list-group-item list-group-item-action">{{ months[i] }}
+                <span class="float-right">{{ count[i] }}</span>
+            </a>
+        {% endfor %}
+    </ul>
+{% endblock body %}
