@@ -15,16 +15,17 @@ class TaskRepository extends \Doctrine\ORM\EntityRepository
      * @param $year
      * @return array
      */
-    public function countByMonths($month, $year){
+    public function getTasksByMonth($month, $year, $user){
         $em = $this->getEntityManager();
-        $date = $year.'-'.$month.'-01';
+        // $date = $year.'-'.$month.'-01';
         $count = $em->createQuery(
             'SELECT r FROM AppBundle:Task r 
-                 WHERE MONTH(:dt) = :mon 
-                 AND YEAR(:dt) = :yr')
-            ->setParameter("dt",$date)
-            ->setParameter("mon",$month)
-            ->setParameter("yr",$year)
+                 WHERE MONTH(r.date) = :mon 
+                 AND YEAR(r.date) = :yr
+                 AND r.user = :currentUser')
+            ->setParameter("mon", $month)
+            ->setParameter("yr", $year)
+            ->setParameter("currentUser", $user)
             ->getResult();
         return $count;
     }
