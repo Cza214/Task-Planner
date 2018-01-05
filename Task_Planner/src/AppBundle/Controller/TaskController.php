@@ -2,11 +2,17 @@
 
 namespace AppBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use AppBundle\Entity\Task;
 use AppBundle\Repository\TaskRepository;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class TaskController
@@ -17,28 +23,69 @@ use AppBundle\Repository\TaskRepository;
 class TaskController extends Controller
 {
     /**
-     * @Route("/", name="show_tasks")
+     * @Route("/", name="show_task")
      */
     public function showAction(){
         $current = new \DateTime('now');
         $months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-        $tasks = $this->numberOfTasksByMonths();
+        $year = $current->format("Y");
+        $tasks = $this->numberOfTasksByMonths($year);
         dump($tasks);
         return $this->render('AppBundle:Task:months.html.twig',['months' => $months, 'current' => $current, 'count' => $tasks]);
     }
 
     /**
+     * @Route("/{month}/{year}", name="show_task_month")
+     */
+    public function showMonthAction($month,$year){
+
+        $days = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+
+        $tasks = $this->numberOfTasksByDay($days,$month,$year);
+        dump($tasks);
+        return $this->render('AppBundle:Task:days.html.twig',['days' => $days, 'count' => $tasks]);
+    }
+    /**
+     * @Route("/new", name="new_task")
+     * @Method("GET")
+     */
+    public function newAction(Request $req){
+
+        $em = $this->getDoctrine()->getManager();
+        $task = new Task();
+        $task->setUser($this->getUser());
+
+        $form = $this->createFormBuilder($task)
+            ->setAction($this->generateUrl('new_task'))
+            ->setMethod('GET')
+            ->add('name', TextType::class)
+            ->add('description', TextType::class)
+            ->add('date', DateType::class)
+            ->add('priority', NumberType::class)
+            ->add('save', SubmitType::class, ['label' => 'Add Task'])
+            ->getForm();
+
+        $form->handleRequest($req);
+        if($form->isSubmitted()){
+            $data = $form->getData();
+            $em->persist($data);
+            $em->flush();
+            return $this->redirect("show_tasks");
+        }
+        return $this->render('AppBundle:Task:new.html.twig',['form' => $form->createView()]);
+    }
+
+    /**
      * Get Number of Tasks by Month
      */
-    protected function numberOfTasksByMonths(){
+    protected function numberOfTasksByMonths($year){
 
         $em = $this->getDoctrine()->getManager();
         $result = [];
 
         for($i = 1; $i <= 12; $i++) {
-            $count = $em->getRepository('AppBundle:Task')->getTasksByMonth($i,"2018",$this->getUser());
-            dump($count);
+            $count = $em->getRepository('AppBundle:Task')->getTasksByMonth($i,$year,$this->getUser());
             $result[$i - 1] = count($count);
         }
         return $result;
@@ -47,7 +94,15 @@ class TaskController extends Controller
     /**
      * Get Number of Tasks by Day
      */
-    protected function numberOfTasksByDay(){
+    protected function numberOfTasksByDay($days,$month,$year){
 
+        $em = $this->getDoctrine()->getManager();
+        $result = [];
+
+        for($i = 1; $i <= $days; $i++) {
+            $count = $em->getRepository('AppBundle:Task')->getTasksByDay($i,$month,$year,$this->getUser());
+            $result[$i] = count($count);
+        }
+        return $result;
     }
 }

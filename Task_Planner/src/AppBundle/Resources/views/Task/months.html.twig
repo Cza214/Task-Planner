@@ -6,7 +6,7 @@
             <span class="float-right"><a href="" class="btn btn-outline-warning btn-sm">{{ current|date("d-m-Y") }}</a></span>
         </li>
         {% for i in 0..11 %}
-            <a href="/{{ i }}" class="list-group-item list-group-item-action">{{ months[i] }}
+            <a href="{{ path('show_task_month', {'month':i + 1,'year':current|date("Y")}) }}" class="list-group-item list-group-item-action">{{ months[i] }}
                 <span class="float-right">{{ count[i] }}</span>
             </a>
         {% endfor %}

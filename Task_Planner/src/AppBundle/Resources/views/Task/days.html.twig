@@ -1,0 +1,15 @@
+{% extends('AppBundle:Task:task.html.twig') %}
+{% block body %}
+    <table class="table table-sm">
+        <tr>
+            <th>DAY</th>
+            <th>TASKS</th>
+        </tr>
+        {% for i in 1..days %}
+            <tr>
+                <td>{{ i }}</td>
+                <td>{{ count[i] }}</td>
+            </tr>
+            {% endfor %}
+    </table>
+{% endblock body %}
