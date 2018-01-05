@@ -1,0 +1,17 @@
+{% extends('AppBundle:Task:task.html.twig') %}
+{% block body %}
+    <table class="table table-sm table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Priority</th>
+        </tr>
+        {% for i in 0..tasks|length - 1 %}
+            <tr>
+                <td>{{ tasks[i].name }}</td>
+                <td>{{ tasks[i].description }}</td>
+                <td>{{ tasks[i].priority }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

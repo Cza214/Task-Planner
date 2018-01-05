@@ -1,15 +1,29 @@
 {% extends('AppBundle:Task:task.html.twig') %}
 {% block body %}
-    <table class="table table-sm">
-        <tr>
-            <th>DAY</th>
-            <th>TASKS</th>
-        </tr>
-        {% for i in 1..days %}
+    <div class="table-responsive">
+        <table class="table table-hover table-sm table-dark table-bordered text-center">
             <tr>
-                <td>{{ i }}</td>
-                <td>{{ count[i] }}</td>
+                <th>DAY</th>
+                <th>OPTIONS</th>
+                <th>TASKS</th>
             </tr>
+            {% for i in 1..days %}
+                <tr>
+                    <a href="">
+                        <td>{{ i }}.{{ month }}</td>
+                        {% set myDatetimeString = year ~ '-' ~ month ~ '-' ~ i %}
+                        {% if count[i] > 0 %}
+                            <td>
+                                <a href="{{ path("show_task",{'year':year, 'month':month, 'day':i}) }}" class="btn btn-sm btn-info">Show</a>
+                                <a href="{{ path("new_task",{'date':myDatetimeString}) }}" class="btn btn-sm btn-warning">New</a>
+                            </td>
+                            {% else %}
+                            <td><a href="{{ path("new_task",{'date':myDatetimeString}) }}" class="btn btn-sm btn-warning">New</a></td>
+                        {% endif %}
+                        <td>{{ count[i] }}</td>
+                    </a>
+                </tr>
             {% endfor %}
-    </table>
+        </table>
+    </div>
 {% endblock body %}

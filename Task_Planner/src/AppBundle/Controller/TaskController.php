@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\Request;
 class TaskController extends Controller
 {
     /**
-     * @Route("/", name="show_task")
+     * Show count of task per month
+     *
+     * @Route("/", name="show")
      */
     public function showAction(){
         $current = new \DateTime('now');
@@ -36,6 +38,22 @@ class TaskController extends Controller
     }
 
     /**
+     * Show Tasks by Day
+     *
+     * @Route("/{month}/{year}/{day}", name="show_task")
+     *
+     */
+    public function showTask($month,$year,$day){
+
+       $em = $this->getDoctrine()->getManager();
+       $tasks = $em->getRepository('AppBundle:Task')->getTasksByDay($day,$month,$year,$this->getUser());
+       dump($tasks);
+       return $this->render('AppBundle:Task:task_content.html.twig',['tasks' => $tasks]);
+    }
+
+    /**
+     * Show count of task per day
+     *
      * @Route("/{month}/{year}", name="show_task_month")
      */
     public function showMonthAction($month,$year){
@@ -44,34 +62,37 @@ class TaskController extends Controller
 
         $tasks = $this->numberOfTasksByDay($days,$month,$year);
         dump($tasks);
-        return $this->render('AppBundle:Task:days.html.twig',['days' => $days, 'count' => $tasks]);
+        return $this->render('AppBundle:Task:days.html.twig',['days' => $days, 'count' => $tasks, 'month' => $month, 'year' => $year]);
     }
     /**
+     * New Task
+     *
      * @Route("/new", name="new_task")
      * @Method("GET")
      */
     public function newAction(Request $req){
 
+        $req_date = $req->query->get('date');
+
+        if($req_date && $this->validateDate(explode('-',$req_date)))
+        {
+            $date = new \DateTime($req_date);
+        } else {
+            $date = new \DateTime("NOW");
+        };
+
         $em = $this->getDoctrine()->getManager();
         $task = new Task();
         $task->setUser($this->getUser());
 
-        $form = $this->createFormBuilder($task)
-            ->setAction($this->generateUrl('new_task'))
-            ->setMethod('GET')
-            ->add('name', TextType::class)
-            ->add('description', TextType::class)
-            ->add('date', DateType::class)
-            ->add('priority', NumberType::class)
-            ->add('save', SubmitType::class, ['label' => 'Add Task'])
-            ->getForm();
+        $form = $this->GetFictionForm($task, $date);
 
         $form->handleRequest($req);
         if($form->isSubmitted()){
             $data = $form->getData();
             $em->persist($data);
             $em->flush();
-            return $this->redirect("show_tasks");
+            return $this->redirect("show");
         }
         return $this->render('AppBundle:Task:new.html.twig',['form' => $form->createView()]);
     }
@@ -104,5 +125,51 @@ class TaskController extends Controller
             $result[$i] = count($count);
         }
         return $result;
+    }
+
+    /**
+     * Return FORM
+     *
+     * @param $task
+     * @param $date
+     * @return \Symfony\Component\Form\FormInterface
+     *
+     */
+    protected function GetFictionForm($task,$date){
+
+        $form = $this->createFormBuilder($task)
+            ->setAction($this->generateUrl('new_task'))
+            ->setMethod('GET')
+            ->add('name', TextType::class)
+            ->add('description', TextType::class)
+            ->add('date', DateType::class, [
+                'data' => $date
+            ])
+            ->add('priority', NumberType::class)
+            ->add('save', SubmitType::class, ['label' => 'Add Task'])
+            ->getForm();
+        return $form;
+    }
+
+    /**
+     * Validate Date | Date must by an array of 3 elements(year,month,day).
+     *  Return true or false.
+     *
+     * @param $date
+     * @return bool
+     *
+     */
+    protected function validateDate(array $date){
+        if(count($date) != 3)
+        {
+            return false;
+        } else {
+            for($i = 0; $i < 3; $i ++){
+                if(!is_numeric($date[$i])){
+                    return false;
+                }
+            }
+            return checkdate($date[1],$date[2],$date[0]);
+        }
     }
 }
