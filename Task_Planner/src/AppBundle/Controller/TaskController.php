@@ -13,6 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 /**
  * Class TaskController
@@ -33,35 +35,42 @@ class TaskController extends Controller
 
         $year = $current->format("Y");
         $tasks = $this->numberOfTasksByMonths($year);
-        dump($tasks);
         return $this->render('AppBundle:Task:months.html.twig',['months' => $months, 'current' => $current, 'count' => $tasks]);
     }
 
     /**
      * Show Tasks by Day
      *
-     * @Route("/{month}/{year}/{day}", name="show_task")
+     * @Route("/show/{month}/{year}/{day}", name="show_task")
      *
      */
     public function showTask($month,$year,$day){
+        if(!$this->validateDate(array($year,$month,$day)))
+        {
+            return $this->redirectToRoute("show");
+        }
+       $current = new \DateTime("$year-$month-$day");
 
        $em = $this->getDoctrine()->getManager();
        $tasks = $em->getRepository('AppBundle:Task')->getTasksByDay($day,$month,$year,$this->getUser());
-       dump($tasks);
-       return $this->render('AppBundle:Task:task_content.html.twig',['tasks' => $tasks]);
+        if(count($tasks) <= 0){return $this->redirectToRoute("show");}
+       return $this->render('AppBundle:Task:task_content.html.twig',['tasks' => $tasks, 'current' => $current]);
     }
 
     /**
      * Show count of task per day
      *
-     * @Route("/{month}/{year}", name="show_task_month")
+     * @Route("/show/{month}/{year}", name="show_task_month")
      */
     public function showMonthAction($month,$year){
+        if(!$this->validateDate(array($year,$month,1)))
+        {
+            return $this->redirectToRoute("show");
+        }
 
         $days = cal_days_in_month(CAL_GREGORIAN,$month,$year);
 
         $tasks = $this->numberOfTasksByDay($days,$month,$year);
-        dump($tasks);
         return $this->render('AppBundle:Task:days.html.twig',['days' => $days, 'count' => $tasks, 'month' => $month, 'year' => $year]);
     }
     /**
@@ -92,8 +101,54 @@ class TaskController extends Controller
             $data = $form->getData();
             $em->persist($data);
             $em->flush();
-            return $this->redirect("show");
+            return $this->redirectToRoute("show");
         }
+        return $this->render('AppBundle:Task:new.html.twig',['form' => $form->createView()]);
+    }
+
+    /**
+     * Delete Task By Id
+     *
+     * @Route("/delete/{id}")
+     */
+    public function deleteAction(Request $req, $id){
+        $em = $this->getDoctrine()->getManager();
+        $task = $em->getRepository('AppBundle:Task')->find($id);
+
+        $referer = $req->headers->get('referer');
+
+        $em->remove($task);
+        $em->flush();
+        $em->clear();
+
+        return $this->redirect($referer);
+    }
+
+    /**
+     * Edit Task
+     *
+     * @Route("/edit/{id}")
+     */
+    public function editAction(Request $req, $id){
+        $em = $this->getDoctrine()->getManager();
+
+        $task = $em->getRepository('AppBundle:Task')->find($id);
+
+        if(!$task){
+            throw $this->createNotFoundException('Sorry not existing');
+        }
+
+        $form = $this->GetFictionForm($task,$task->getDate());
+        $form->handleRequest($req);
+        if($form->isSubmitted())
+        {
+            $data = $form->getData();
+            $em->persist($data);
+            $em->flush();
+            $em->clear();
+            return $this->redirectToRoute("show");
+        }
+
         return $this->render('AppBundle:Task:new.html.twig',['form' => $form->createView()]);
     }
 
@@ -146,7 +201,7 @@ class TaskController extends Controller
                 'data' => $date
             ])
             ->add('priority', NumberType::class)
-            ->add('save', SubmitType::class, ['label' => 'Add Task'])
+            ->add('save', SubmitType::class, ['label' => 'Confirm'])
             ->getForm();
         return $form;
     }

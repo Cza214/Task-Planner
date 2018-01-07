@@ -10,7 +10,7 @@
             {% for i in 1..days %}
                 <tr>
                     <a href="">
-                        <td>{{ i }}.{{ month }}</td>
+                        <td>{% if i < 10 %}0{{ i }}{% else %}{{ i }}{% endif %}.{{ month }}</td>
                         {% set myDatetimeString = year ~ '-' ~ month ~ '-' ~ i %}
                         {% if count[i] > 0 %}
                             <td>

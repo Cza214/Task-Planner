@@ -1,16 +1,23 @@
 {% extends('AppBundle:Task:task.html.twig') %}
 {% block body %}
+    <h2>{{ current|date("M-D-Y") }}</h2>
     <table class="table table-sm table-dark">
         <tr>
             <th>Title</th>
             <th>Description</th>
             <th>Priority</th>
+            <th>Options</th>
         </tr>
         {% for i in 0..tasks|length - 1 %}
             <tr>
                 <td>{{ tasks[i].name }}</td>
                 <td>{{ tasks[i].description }}</td>
                 <td>{{ tasks[i].priority }}</td>
+                <td>
+                    <a href="{{ path('app_task_delete',{'id':tasks[i].id}) }}" class="btn btn-sm btn-success">Done</a>
+                    <a href="{{ path('app_task_edit',{'id':tasks[i].id}) }}" class="btn btn-sm btn-secondary">Edit</a>
+                    <a href="" class="btn btn-sm btn-success">Comment</a>
+                </td>
             </tr>
         {% endfor %}
     </table>

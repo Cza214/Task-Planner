@@ -1,0 +1,8 @@
+{% extends "@FOSUser/layout.html.twig" %}
+{% block fos_profile_content %}
+    {% block body %}
+        {% for comment in comments %}
+                {{ include('AppBundle:comment:comment_content.html.twig',{'comment':comment}) }}
+            {% endfor %}
+    {% endblock body %}
+{% endblock %}
