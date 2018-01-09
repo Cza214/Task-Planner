@@ -53,6 +53,12 @@ class TaskController extends Controller
 
        $em = $this->getDoctrine()->getManager();
        $tasks = $em->getRepository('AppBundle:Task')->getTasksByDay($day,$month,$year,$this->getUser());
+
+        // Sort Array of Tasks By Priority ( using usort function )
+       usort($tasks,function($a,$b){
+          return $a->getPriority() > $b->getPriority();
+       });
+
         if(count($tasks) <= 0){return $this->redirectToRoute("show");}
        return $this->render('AppBundle:Task:task_content.html.twig',['tasks' => $tasks, 'current' => $current]);
     }
