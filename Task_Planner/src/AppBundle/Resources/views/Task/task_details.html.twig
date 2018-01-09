@@ -1,0 +1,20 @@
+{% extends('AppBundle:Task:task.html.twig') %}
+{% block head %}
+    <script src="{{ asset('/js/task.js') }}"></script>
+{% endblock head %}
+{% block body %}
+    <div class="task">
+        <h3>Task <b>{{ task.date|date("d.m.Y") }}</b></h3>
+        <p>{{ task.description }}</p>
+        <h3><b>Comments:</b></h3>
+        <div class="comments">
+            <!-- Comments By AJAX -->
+        </div>
+        <div class="comment-form">
+            <form action="{{ path('app_comment_newcomment',{'id':task.id}) }}" method="post">
+                <input type="text" name="text" placeholder="Comment">
+                <input type="submit" value="Add Comment">
+            </form>
+        </div>
+    </div>
+{% endblock %}

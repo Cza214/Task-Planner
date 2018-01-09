@@ -73,6 +73,20 @@ class TaskController extends Controller
         $tasks = $this->numberOfTasksByDay($days,$month,$year);
         return $this->render('AppBundle:Task:days.html.twig',['days' => $days, 'count' => $tasks, 'month' => $month, 'year' => $year]);
     }
+
+    /**
+     * Show One Task With Details By ID
+     *
+     * @Route("/details/{id}")
+     *
+     */
+    public function showTaskDetailsAction($id){
+        $em = $this->getDoctrine()->getManager();
+
+        $task = $em->getRepository("AppBundle:Task")->find($id);
+        return $this->render('AppBundle:Task:task_details.html.twig',['task' => $task]);
+    }
+
     /**
      * New Task
      *

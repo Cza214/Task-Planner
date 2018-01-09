@@ -1,4 +1,6 @@
 {% extends('base.html.twig') %}
+{% block head %}
+{% endblock head %}
 {% block script %}<script src="{{ asset('js/pofile.js') }}"></script>{% endblock %}
 {% block content %}
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}

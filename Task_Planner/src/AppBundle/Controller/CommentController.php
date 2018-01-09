@@ -2,9 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Comment;
+use AppBundle\Entity\Task;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class CommentController
@@ -33,8 +36,21 @@ class CommentController extends Controller
      *
      * @Route("/new/{id}")
      */
-    public function newComment($id){
+    public function newComment(Request $req, $id){
+        $em = $this->getDoctrine()->getManager();
+        $referer = $req->headers->get('referer');
 
+        $task = $em->getRepository('AppBundle:Task')->find($id);
+        $text = $req->request->get('text');
+
+        $comment = new Comment();
+        $comment->setDate(new \DateTime("now"));
+        $comment->setText($text);
+        $comment->setTasks($task);
+        $em->persist($comment);
+        $em->flush();
+
+        return $this->redirect($referer);
     }
 
     /**
