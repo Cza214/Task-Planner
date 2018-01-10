@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Comment
@@ -25,6 +26,10 @@ class Comment
      * @var string
      *
      * @ORM\Column(name="text", type="string", length=255)
+     * @Assert\Length(
+     *     min = 6,
+     *     max = 250
+     * )
      */
     private $text;
 
@@ -32,6 +37,7 @@ class Comment
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="date")
+     * @Assert\Date()
      */
     private $date;
 

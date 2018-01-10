@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Task
@@ -25,6 +26,10 @@ class Task
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=100)
+     * @Assert\Length(
+     *     min = 2,
+     *     max = 98,
+     * )
      */
     private $name;
 
@@ -32,6 +37,10 @@ class Task
      * @var string
      *
      * @ORM\Column(name="description", type="string", length=255)
+     * @Assert\Length(
+     *     min = 8,
+     *     max = 250,
+     * )
      */
     private $description;
 
@@ -39,6 +48,7 @@ class Task
      * @var \DateTime
      *
      * @ORM\Column(name="date", type="datetimetz")
+     * @Assert\Date(message = "Wrong Date")
      */
     private $date;
 

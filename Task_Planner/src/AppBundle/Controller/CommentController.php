@@ -43,22 +43,19 @@ class CommentController extends Controller
         $task = $em->getRepository('AppBundle:Task')->find($id);
         $text = $req->request->get('text');
 
+
         $comment = new Comment();
-        $comment->setDate(new \DateTime("now"));
-        $comment->setText($text);
-        $comment->setTasks($task);
-        $em->persist($comment);
-        $em->flush();
+        $validator = $this->get('validator');
+        $errors = $validator->validate($comment);
+
+        if(count($errors) <= 0) {
+            $comment->setDate(new \DateTime("now"));
+            $comment->setText($text);
+            $comment->setTasks($task);
+            $em->persist($comment);
+            $em->flush();
+        }
 
         return $this->redirect($referer);
-    }
-
-    /**
-     * Delete Each Comment
-     *
-     * @Route("/delete/{id}")
-     */
-    public function deleteComment($id){
-
     }
 }

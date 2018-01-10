@@ -1,4 +1,7 @@
 /.web-server-pid
+.idea
+vendor
+.htaccess
 /app/config/parameters.yml
 /build/
 /phpunit.xml

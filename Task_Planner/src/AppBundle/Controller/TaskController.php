@@ -117,7 +117,7 @@ class TaskController extends Controller
         $form = $this->GetFictionForm($task, $date);
 
         $form->handleRequest($req);
-        if($form->isSubmitted()){
+        if($form->isSubmitted() && $form->isValid()){
             $data = $form->getData();
             $em->persist($data);
             $em->flush();
@@ -160,7 +160,7 @@ class TaskController extends Controller
 
         $form = $this->GetFictionForm($task,$task->getDate());
         $form->handleRequest($req);
-        if($form->isSubmitted())
+        if($form->isSubmitted() && $form->isValid())
         {
             $data = $form->getData();
             $em->persist($data);
